@@ -1,0 +1,14 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!--<pattern>%msg%n</pattern>-->
+            <pattern>%-5level [%file:%-5line] | %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="tr.emreone.debugLogger" level="DEBUG" />
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
