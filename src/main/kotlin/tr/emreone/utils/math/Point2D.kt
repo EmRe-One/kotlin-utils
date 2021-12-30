@@ -40,6 +40,10 @@ class Point2D(val x: Long, val y: Long) {
             Point2D(x - 1, y)   // west
         )
 
+    /**
+     *
+     * @return List<Point2D>
+     */
     fun allNeighbors(): List<Point2D> =
         neighbors() + listOf(
             Point2D(x + 1, y - 1),  // north-east
@@ -47,8 +51,6 @@ class Point2D(val x: Long, val y: Long) {
             Point2D(x - 1, y + 1),  // south-west
             Point2D(x - 1, y - 1)   // north-west
         )
-
-
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

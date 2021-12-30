@@ -1,5 +1,11 @@
 package tr.emreone.utils.extensions
 
+/**
+ *
+ * @receiver MutableList<Pair<String, Long>>
+ * @param from MutableList<Pair<String, Long>>
+ * @param deep Boolean
+ */
 fun MutableList<Pair<String, Long>>.copy(from: MutableList<Pair<String, Long>>, deep: Boolean = false) {
     this.clear()
 
@@ -15,6 +21,9 @@ fun MutableList<Pair<String, Long>>.copy(from: MutableList<Pair<String, Long>>, 
 
 /**
  * Create a permutation of the given list
+ *
+ * @receiver List<T>
+ * @return List<List<T>>
  */
 fun <T> List<T>.permutations(): List<List<T>> {
     if (size == 1) return listOf(this)
@@ -29,8 +38,20 @@ fun <T> List<T>.permutations(): List<List<T>> {
 /*
  *  POWERSETS
  */
+
+/**
+ *
+ * @receiver Collection<T>
+ * @return Set<Set<T>>
+ */
 fun <T> Collection<T>.powerset(): Set<Set<T>> = powerset(this, setOf(setOf()))
 
+/**
+ *
+ * @param left Collection<T>
+ * @param acc Set<Set<T>>
+ * @return Set<Set<T>>
+ */
 private tailrec fun <T> powerset(left: Collection<T>, acc: Set<Set<T>>): Set<Set<T>> = when {
     left.isEmpty() -> acc
     else -> powerset(left.drop(1), acc + acc.map { it + left.first() })
@@ -47,6 +68,10 @@ private tailrec fun <T> powerset(left: Collection<T>, acc: Set<Set<T>>): Set<Set
  * For set {1, 2, 3}, 2 elements combinations are {1, 2}, {2, 3}, {1, 3}.
  * All possible combinations is called 'powerset' and can be found as an
  * extension function for set under this name
+ *
+ * @receiver Set<T>
+ * @param combinationSize Int
+ * @return Set<Set<T>>
  */
 fun <T> Set<T>.combinations(combinationSize: Int): Set<Set<T>> = when {
     combinationSize < 0 -> throw Error("combinationSize cannot be smaller then 0. It is equal to $combinationSize")
@@ -57,6 +82,12 @@ fun <T> Set<T>.combinations(combinationSize: Int): Set<Set<T>> = when {
         .toSet()
 }
 
+/**
+ *
+ * @receiver Set<T>
+ * @param combinationSize Int
+ * @return Set<Map<T, Int>>
+ */
 fun <T> Set<T>.combinationsWithRepetitions(combinationSize: Int): Set<Map<T, Int>> = when {
     combinationSize < 0 -> throw Error("combinationSize cannot be smaller then 0. It is equal to $combinationSize")
     combinationSize == 0 -> setOf(mapOf())
@@ -69,7 +100,13 @@ fun <T> Set<T>.combinationsWithRepetitions(combinationSize: Int): Set<Map<T, Int
  * SPLITS
  */
 
-// Takes set of elements and returns set of splits and each of them is set of sets
+/**
+ * Takes set of elements and returns set of splits and each of them is set of sets
+ *
+ * @receiver Set<T>
+ * @param groupsNum Int
+ * @return Set<Set<Set<T>>>
+ */
 fun <T> Set<T>.splits(groupsNum: Int): Set<Set<Set<T>>> = when {
     groupsNum < 0 -> throw Error("groupsNum cannot be smaller then 0. It is equal to $groupsNum")
     groupsNum == 0 -> if (isEmpty()) setOf(emptySet()) else emptySet()
@@ -81,11 +118,23 @@ fun <T> Set<T>.splits(groupsNum: Int): Set<Set<Set<T>>> = when {
         .plus(splitsForFirstIsInAllGroups(groupsNum))
 }
 
+/**
+ *
+ * @receiver Set<T>
+ * @param groupsNum Int
+ * @return List<Set<Set<T>>>
+ */
 private fun <T> Set<T>.splitsWhereFirstIsAlone(groupsNum: Int): List<Set<Set<T>>> = this
     .minusElement(first())
     .splits(groupsNum - 1)
     .map { it.plusElement(setOf(first())) }
 
+/**
+ *
+ * @receiver Set<T>
+ * @param groupsNum Int
+ * @return List<Set<Set<T>>>
+ */
 private fun <T> Set<T>.splitsForFirstIsInAllGroups(groupsNum: Int): List<Set<Set<T>>> = this
     .minusElement(first())
     .splits(groupsNum)

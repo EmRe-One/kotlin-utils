@@ -5,6 +5,9 @@ import java.security.MessageDigest
 
 /**
  * Converts string to md5 hash.
+ *
+ * @receiver String
+ * @return String
  */
 fun String.md5(): String = BigInteger(1,
     MessageDigest.getInstance("MD5").digest(toByteArray())
