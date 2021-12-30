@@ -21,3 +21,5 @@ gradle-app.setting
 
 # Cache of project
 .gradletasknamecache
+
+keys.properties
