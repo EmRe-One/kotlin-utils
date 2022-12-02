@@ -1,4 +1,4 @@
-package de.emreak.adventofcode.days
+package tr.emreone.adventofcode.days
 
 import tr.emreone.utils.Resources
 import org.junit.jupiter.api.Assertions.*

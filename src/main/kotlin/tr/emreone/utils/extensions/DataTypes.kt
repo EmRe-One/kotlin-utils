@@ -13,7 +13,6 @@ fun String.md5(): String = BigInteger(1,
     MessageDigest.getInstance("MD5").digest(toByteArray())
 ).toString(16)
 
-/*
 // TODO check if this is correct
 fun String.sha256(): String = BigInteger(1,
     MessageDigest.getInstance("SHA256").digest(toByteArray())
@@ -22,21 +21,14 @@ fun String.sha256(): String = BigInteger(1,
 fun String.sha512(): String = BigInteger(1,
     MessageDigest.getInstance("SHA512").digest(toByteArray())
 ).toString(16)
-*/
 
-operator fun String.times(i: Int): String {
-    return IntRange(0, (i - 1)).joinToString("") {
-        this
-    }
+operator fun String.times(n: Int): String {
+    return this.repeat(n)
 }
 
 operator fun Char.times(i: Int): String {
-    return IntRange(0, (i - 1)).joinToString("") {
-        this.toString()
-    }
+    return this.toString() * i
 }
-
-typealias Coords = Pair<Int, Int>
 
 fun List<Pair<Long, Long>>.sum() = reduce { acc, pair -> acc + pair }
 
