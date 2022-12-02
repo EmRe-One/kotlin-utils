@@ -1,4 +1,4 @@
-package de.emreak.adventofcode.days
+package tr.emreone.adventofcode.days
 
 object Day$1 {
 
