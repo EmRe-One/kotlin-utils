@@ -50,12 +50,19 @@ repositories {
     }
 }
 
-// TODO call task with parameters for nextDay and PackageIdPath
 tasks.register("prepareNextDay") {
+    var day: Int = 0
+    var packageId: String = ""
+
+    doFirst {
+        day = properties["day"]?.toString()?.toInt() ?: 1
+        packageId = properties["packageId"]?.toString() ?: "tr.emreone.adventofcode"
+    }
+
     doLast {
-        val nextDay = "01"
+        val nextDay = day.toString().padStart(2, '0')
         val withTest = true
-        val packageIdPath = "tr.emreone.adventofcode".replace(".", "/")
+        val packageIdPath = packageId.replace(".", "/")
 
         val mainFile    = "${projectDir}/src/main/kotlin/${packageIdPath}/Main.kt"
         val readmeFile  = "${projectDir}/README.md"
