@@ -27,7 +27,7 @@ fun MutableList<Pair<String, Long>>.copy(from: MutableList<Pair<String, Long>>, 
  */
 fun <T> List<T>.permutations(): List<List<T>> {
     if (size == 1) return listOf(this)
-    return (0 until this.size).flatMap { i ->
+    return indices.flatMap { i ->
         val rest = subList(0, i) + subList(i + 1, size)
         rest.permutations().map {
             listOf(this[i]) + it

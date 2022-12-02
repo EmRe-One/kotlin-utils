@@ -3,6 +3,8 @@ package tr.emreone.utils.math
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
+typealias Coords = Pair<Int, Int>
+
 class Point2D(val x: Long, val y: Long) {
 
     infix fun sharesAxisWith(that: Point2D): Boolean =
