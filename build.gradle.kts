@@ -19,6 +19,24 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
+publishing {
+    repositories {
+        maven {
+            name = "Kotlin-Utils"
+            url = uri("https://maven.pkg.github.com/Emre-One/kotlin-utils")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        register<MavenPublication>("gpr") {
+            from(components["java"])
+        }
+    }
+}
+
 tasks {
     test {
         useJUnitPlatform()
