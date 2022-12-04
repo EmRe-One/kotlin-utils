@@ -29,14 +29,19 @@ java {
 
 fun getValue(key: String, filename: String = "keys.properties"): String {
     val items = HashMap<String, String>()
-    val f = File(filename)
+    try {
+        val f = File(filename)
 
-    f.forEachLine {
-        val split = it.split("=")
-        items[split[0].trim()] = split[1].trim().removeSurrounding("\"")
+        f.forEachLine {
+            val split = it.split("=")
+            items[split[0].trim()] = split[1].trim().removeSurrounding("\"")
+        }
+        return items[key]?: throw IllegalArgumentException("Key $key not found")
+
+    } catch (e: Exception) {
+        println("Error: $e")
     }
-
-    return items[key]?: throw IllegalArgumentException("Key $key not found")
+    return ""
 }
 
 repositories {
