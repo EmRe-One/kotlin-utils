@@ -27,40 +27,12 @@ java {
     withJavadocJar()
 }
 
-fun getValue(key: String, filename: String = "keys.properties"): String {
-    val items = HashMap<String, String>()
-    try {
-        val f = File(filename)
-
-        f.forEachLine {
-            val split = it.split("=")
-            items[split[0].trim()] = split[1].trim().removeSurrounding("\"")
-        }
-        return items[key]?: throw IllegalArgumentException("Key $key not found")
-
-    } catch (e: Exception) {
-        println("Error: $e")
-    }
-    return ""
-}
-
-repositories {
-    mavenCentral()
-    maven {
-        url = uri("https://maven.pkg.github.com/Emre-One/kotlin-utils")
-        credentials {
-            username = getValue("GITHUB_USERNAME")
-            password = getValue("GITHUB_TOKEN")
-        }
-    }
-}
-
 tasks.register("prepareNextDay") {
-    var day: Int = 0
-    var packageId: String = ""
+    var day = 0
+    var packageId = ""
 
     doFirst {
-        day = properties["day"]?.toString()?.toInt() ?: 1
+        day = properties["day"]?.toString()?.toInt() ?: 0
         packageId = properties["packageId"]?.toString() ?: "tr.emreone.adventofcode"
     }
 
