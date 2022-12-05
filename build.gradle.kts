@@ -29,6 +29,8 @@ publishing {
     }
     publications {
         register<MavenPublication>("gpr") {
+            groupId = "tr.emreone"
+            artifactId = "kotlin-utils"
             from(components["java"])
         }
     }
