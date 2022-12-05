@@ -3,9 +3,6 @@ plugins {
     `maven-publish`
 }
 
-group = "tr.emreone"
-version = "0.1.3-SNAPSHOT"
-
 repositories {
     mavenCentral()
 }
@@ -32,6 +29,8 @@ publishing {
     }
     publications {
         register<MavenPublication>("gpr") {
+            groupId = "tr.emreone"
+            artifactId = "kotlin-utils"
             from(components["java"])
         }
     }
