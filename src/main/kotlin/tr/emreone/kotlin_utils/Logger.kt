@@ -1,4 +1,4 @@
-package tr.emreone.utils
+package tr.emreone.kotlin_utils
 
 import mu.KotlinLogging
 

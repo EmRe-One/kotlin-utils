@@ -1,4 +1,4 @@
-package tr.emreone.utils.math
+package tr.emreone.kotlin_utils.math
 
 class Vector3D(val x: Long, val y: Long, val z: Long) {
 

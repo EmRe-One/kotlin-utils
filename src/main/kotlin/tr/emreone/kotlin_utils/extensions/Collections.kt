@@ -1,4 +1,4 @@
-package tr.emreone.utils.extensions
+package tr.emreone.kotlin_utils.extensions
 
 /**
  *

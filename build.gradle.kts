@@ -8,16 +8,26 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_19
+    targetCompatibility = JavaVersion.VERSION_19
+
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    // Do not use, no effect; will be overridden by kotlinDslPluginOptions.jvmTarget, see KotlinDslCompilerPlugins.
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_19.toString()
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
+
     implementation("org.slf4j:slf4j-api:2.0.5")
     implementation("ch.qos.logback:logback-classic:1.4.5")
     implementation("ch.qos.logback:logback-core:1.4.5")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
+
     testImplementation(kotlin("test"))
 }
 
@@ -47,11 +57,6 @@ tasks {
     }
 }
 
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
 tasks.register("prepareNextDay") {
     var day = 0
     var packageId = ""
@@ -73,7 +78,8 @@ tasks.register("prepareNextDay") {
 
         if (file(newSrcFile).exists()) {
             println("WARNING: Files for Day$nextDay already exists. Do you really want to overwrite it?")
-        } else {
+        }
+        else {
             file(newSrcFile).writeText(
                 file("${projectDir}/template/DayX.kt")
                     .readText()

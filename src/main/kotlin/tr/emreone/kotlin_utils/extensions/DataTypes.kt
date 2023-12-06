@@ -1,4 +1,4 @@
-package tr.emreone.utils.extensions
+package tr.emreone.kotlin_utils.extensions
 
 fun List<Pair<Long, Long>>.sum() = reduce { acc, pair -> acc + pair }
 

@@ -1,4 +1,4 @@
-package tr.emreone.utils.math
+package tr.emreone.kotlin_utils.math
 
 import kotlin.math.abs
 

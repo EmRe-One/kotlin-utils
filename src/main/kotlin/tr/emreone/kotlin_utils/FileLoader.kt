@@ -1,7 +1,6 @@
-package tr.emreone.utils
+package tr.emreone.kotlin_utils
 
 import java.io.File
-import java.net.URI
 
 /**
  *

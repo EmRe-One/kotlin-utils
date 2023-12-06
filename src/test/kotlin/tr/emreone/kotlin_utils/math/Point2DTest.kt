@@ -1,6 +1,7 @@
-package tr.emreone.utils.math
+package tr.emreone.kotlin_utils.math
 
 import org.junit.jupiter.api.Test
+import tr.emreone.kotlin_utils.math.Point2D
 import kotlin.test.assertContains
 
 internal class Point2DTest {
