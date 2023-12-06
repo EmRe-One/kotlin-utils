@@ -48,7 +48,7 @@ fun getAllDayClasses(): Collection<Class<out Day>> =
 fun dayNumber(day: Class<out Day>) = day.simpleName.replace("Day", "").toInt()
 
 @ExperimentalTime
-private fun Class<out Day>.execute(): Duration {
+fun Class<out Day>.execute(): Duration {
     fun TimedValue<Any?>.show(n: Int, padded: Int) {
         val x = " ".repeat(padded) + "Part $n [$duration]: "
         println(
