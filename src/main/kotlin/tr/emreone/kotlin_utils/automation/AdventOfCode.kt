@@ -35,7 +35,6 @@ private fun getAllDayClasses(): Collection<Class<out Day>> =
 
 @ExperimentalTime
 private fun Class<out Day>.execute(): Duration {
-
     fun TimedValue<Any?>.show(n: Int, padded: Int) {
         val x = " ".repeat(padded) + "Part $n [$duration]: "
         println("$x$value".trimEnd().split("\n").joinToString("\n".padEnd(x.length + 1, ' ')))
@@ -153,8 +152,8 @@ class ParserContext(private val columnSeparator: Regex, private val line: String
     val longs: List<Long> by lazy { line.extractAllLongs() }
 }
 
-private fun String.extractInt() = toIntOrNull() ?: sequenceContainedIntegers().first()
-private fun String.extractLong() = toLongOrNull() ?: sequenceContainedLongs().first()
+fun String.extractInt() = toIntOrNull() ?: sequenceContainedIntegers().first()
+fun String.extractLong() = toLongOrNull() ?: sequenceContainedLongs().first()
 
 private val numberRegex = Regex("(-+)?\\d+")
 private val positiveNumberRegex = Regex("\\d+")
@@ -191,7 +190,7 @@ private fun <T> warn(msg: String): T? {
     return null
 }
 
-private fun Any?.restrictWidth(minWidth: Int, maxWidth: Int) = with("$this") {
+fun Any?.restrictWidth(minWidth: Int, maxWidth: Int) = with("$this") {
     when {
         length > maxWidth -> substring(0, maxWidth - 3) + "..."
         length < minWidth -> padEnd(minWidth)
@@ -200,7 +199,6 @@ private fun Any?.restrictWidth(minWidth: Int, maxWidth: Int) = with("$this") {
 }
 
 object AoC {
-
     private val web = AoCWebInterface(getSessionCookie())
 
     fun sendToClipboard(a: Any?): Boolean {

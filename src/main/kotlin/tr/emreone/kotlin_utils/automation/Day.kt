@@ -1,4 +1,8 @@
 package tr.emreone.kotlin_utils.automation
+
+import com.github.ajalt.mordant.rendering.TextColors
+import com.github.ajalt.mordant.terminal.Terminal
+
 @Suppress("MemberVisibilityCanBePrivate")
 open class Day private constructor(
     val fqd: FQD,
@@ -82,16 +86,16 @@ open class Day private constructor(
     private fun submit(part1: Any?, part2: Any?) {
         println()
         if ("$part1" == "$part2") {
-            aocTerminal.println(yellow("The two answers are identical. No submitting allowed."))
+            aocTerminal.println(TextColors.yellow("The two answers are identical. No submitting allowed."))
             return
         }
-        listOfNotNull(part2.isPossibleAnswerOrNull(P2), part1.isPossibleAnswerOrNull(P1)).firstOrNull()
+        listOfNotNull(part2.isPossibleAnswerOrNull(Part.P2), part1.isPossibleAnswerOrNull(Part.P1)).firstOrNull()
             ?.let { (part, answer) ->
                 with(aocTerminal) {
                     val previouslySubmitted =
-                        tr.emreone.kotlin_utils.automation.AoC.previouslySubmitted(day, year, part)
+                        AoC.previouslySubmitted(day, year, part)
                     if (answer in previouslySubmitted) {
-                        println(brightMagenta("This answer to part $part has been previously submitted!"))
+                        println(TextColors.brightMagenta("This answer to part $part has been previously submitted!"))
                         return
                     }
                     if (previouslySubmitted.isNotEmpty()) {
@@ -101,15 +105,15 @@ open class Day private constructor(
                         "wait $it seconds and then "
                     }.orEmpty()
                     val choice = prompt(
-                        brightCyan("""Should I ${extra}submit "${brightBlue(answer)}" as answer to part $part?"""),
+                        TextColors.brightCyan("""Should I ${extra}submit "${TextColors.brightBlue(answer)}" as answer to part $part?"""),
                         choices = listOf("y", "n"),
                         default = "n"
                     )
                     if (choice == "y") {
                         previouslySubmitted.waitUntilFree()
-                        val verdict = tr.emreone.kotlin_utils.automation.AoC.submitAnswer(fqd, part, answer)
+                        val verdict = AoC.submitAnswer(fqd, part, answer)
                         println(verdict)
-                        tr.emreone.kotlin_utils.automation.AoC.appendSubmitLog(day, year, part, answer, verdict)
+                        AoC.appendSubmitLog(day, year, part, answer, verdict)
                     }
                 }
             }
