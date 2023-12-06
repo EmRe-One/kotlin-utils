@@ -54,17 +54,20 @@ fun IntRange.subtract(vararg others: IntRange): List<IntRange> = subtract(others
  */
 fun IntRange.subtract(others: Iterable<IntRange>): List<IntRange> {
     val relevant = others.merge().filter { it overlaps this }
+
+    // if relevant is empty nothing to remove -> return list
     if (relevant.isEmpty()) return listOf(this)
 
     return buildList {
-        var includeFrom = first
+        var includeFrom = this@subtract.first()
+
         relevant.forEach { minus ->
-            if (minus.first > includeFrom)
-                add(includeFrom until minus.first.coerceAtMost(last))
-            includeFrom = minus.last + 1
+            if (minus.first() > includeFrom)
+                add(includeFrom until minus.first.coerceAtMost(this@subtract.last()))
+            includeFrom = minus.last() + 1
         }
-        if (includeFrom <= last)
-            add(includeFrom..last)
+        if (includeFrom <= this@subtract.last())
+            add(includeFrom..this@subtract.last())
     }
 }
 
@@ -108,16 +111,20 @@ fun LongRange.subtract(vararg others: LongRange): List<LongRange> = subtract(oth
  */
 fun LongRange.subtract(others: Iterable<LongRange>): List<LongRange> {
     val relevant = others.merge().filter { it overlaps this }
+
+    // if relevant is empty nothing to remove -> remove list
     if (relevant.isEmpty()) return listOf(this)
 
     return buildList {
-        var includeFrom = first
+        var includeFrom = this@subtract.first()
+
         relevant.forEach { minus ->
-            if (minus.first > includeFrom)
-                add(includeFrom until minus.first.coerceAtMost(last))
-            includeFrom = minus.last + 1
+            if (minus.first() > includeFrom)
+                add(includeFrom until minus.first().coerceAtMost(this@subtract.last()))
+
+            includeFrom = minus.last() + 1
         }
-        if (includeFrom <= last)
-            add(includeFrom..last)
+        if (includeFrom <= this@subtract.last())
+            add(includeFrom..this@subtract.last())
     }
 }

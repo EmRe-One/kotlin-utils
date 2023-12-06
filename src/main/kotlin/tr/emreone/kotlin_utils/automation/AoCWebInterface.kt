@@ -2,6 +2,7 @@ package tr.emreone.kotlin_utils.automation
 
 import com.github.ajalt.mordant.rendering.TextColors
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 import java.net.URLEncoder
 import kotlin.time.Duration
@@ -10,21 +11,22 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class AoCWebInterface(private val sessionCookie: String?) {
+
     companion object {
         private const val BASE_URL = "https://adventofcode.com"
         private const val RIGHT = "That's the right answer"
         private const val FAIL = "That's not the right answer"
         private const val TOO_RECENT = "You gave an answer too recently"
 
-        fun FQD.toUri() = "$BASE_URL/$year/day/$day"
+        fun AoCPuzzle.toUri() = "$BASE_URL/$year/day/$day"
 
         private fun String.urlEncode() = URLEncoder.encode(this, Charsets.UTF_8)
     }
 
-    fun downloadInput(fqd: FQD): Result<List<String>> = runCatching {
-        with(fqd) {
-            println("Downloading puzzle for $fqd...")
-            val url = URL("${fqd.toUri()}/input")
+    fun downloadInput(aocPuzzle: AoCPuzzle): Result<List<String>> = runCatching {
+        with(aocPuzzle) {
+            println("Downloading puzzle for $aocPuzzle...")
+            val url = URI("${aocPuzzle.toUri()}/input").toURL()
             val cookies = mapOf("session" to sessionCookie)
 
             with(url.openConnection()) {
@@ -37,10 +39,10 @@ class AoCWebInterface(private val sessionCookie: String?) {
         }
     }
 
-    fun submitAnswer(fqd: FQD, part: Part, answer: String): Verdict = runCatching {
-        with(fqd) {
-            println("Submitting answer for $fqd...")
-            val url = URL("${fqd.toUri()}/answer")
+    fun submitAnswer(aocPuzzle: AoCPuzzle, part: Part, answer: String): Verdict = runCatching {
+        with(aocPuzzle) {
+            println("Submitting answer for $aocPuzzle...")
+            val url = URI("${aocPuzzle.toUri()}/answer").toURL()
             val cookies = mapOf("session" to sessionCookie)
             val payload = "level=$part&answer=${answer.urlEncode()}"
             with(url.openConnection() as HttpURLConnection) {
@@ -124,5 +126,4 @@ class AoCWebInterface(private val sessionCookie: String?) {
             }
         }
     }
-
 }

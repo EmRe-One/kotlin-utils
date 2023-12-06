@@ -5,32 +5,29 @@ import com.github.ajalt.mordant.terminal.Terminal
 
 @Suppress("MemberVisibilityCanBePrivate")
 open class Day private constructor(
-    val fqd: FQD,
+    val puzzle: AoCPuzzle,
     val title: String,
     private val terminal: Terminal,
 ) {
-    constructor(day: Int, year: Int, title: String = "unknown", terminal: Terminal = aocTerminal) : this(
-        FQD(day, Event(year)), title, terminal
+    constructor(day: Int, year: Int, title: String = "Puzzle unknown", terminal: Terminal = aocTerminal) : this(
+        AoCPuzzle(day, year), title, terminal
     )
-
-    val day = fqd.day
-    val year = fqd.year
 
     var testInput = false
 
-    private val header: Unit by lazy { if (verbose) println("--- AoC $year, Day $day: $title ---\n") }
+    private val header: Unit by lazy { if (verbose) println("--- AoC ${puzzle.year}, Day ${puzzle.day}: $title ---\n") }
 
     private val rawInput: List<String> by lazy {
         globalTestData?.also {
             logEnabled = true
             testInput = true
-        }?.split("\n") ?: AoC.getPuzzleInput(day, year).also {
+        }?.split("\n") ?: AoC.getPuzzleInput(this.puzzle).also {
             logEnabled = false
         }
     }
 
     // all the different ways to get your input
-    val input: List<String> by lazy { rawInput.show("Raw") }
+    val inputAsList: List<String> by lazy { rawInput.show("Raw") }
     val inputAsGrid: List<List<Char>> by lazy { rawInput.map { it.toList() }.show("Grid") }
     val inputAsInts: List<Int> by lazy { rawInput.map { it.extractInt() }.show("Int") }
     val inputAsLongs: List<Long> by lazy { rawInput.map { it.extractLong() }.show("Long") }
@@ -93,7 +90,7 @@ open class Day private constructor(
             ?.let { (part, answer) ->
                 with(aocTerminal) {
                     val previouslySubmitted =
-                        AoC.previouslySubmitted(day, year, part)
+                        AoC.previouslySubmitted(puzzle, part)
                     if (answer in previouslySubmitted) {
                         println(TextColors.brightMagenta("This answer to part $part has been previously submitted!"))
                         return
@@ -111,9 +108,9 @@ open class Day private constructor(
                     )
                     if (choice == "y") {
                         previouslySubmitted.waitUntilFree()
-                        val verdict = AoC.submitAnswer(fqd, part, answer)
+                        val verdict = AoC.submitAnswer(puzzle, part, answer)
                         println(verdict)
-                        AoC.appendSubmitLog(day, year, part, answer, verdict)
+                        AoC.appendSubmitLog(puzzle, part, answer, verdict)
                     }
                 }
             }

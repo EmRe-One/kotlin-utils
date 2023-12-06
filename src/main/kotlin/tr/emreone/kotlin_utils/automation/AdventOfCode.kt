@@ -18,6 +18,18 @@ import kotlin.time.*
 const val FAST_MODE = false
 
 val aocTerminal = Terminal()
+var logEnabled = false
+var verbose = true
+
+/**
+ * Dirty, but effective way to inject test data globally for one-time use only!
+ * Will be reset on first read.
+ */
+var globalTestData: String? = null
+    get() = field?.also {
+        println("\n!!!! USING TEST DATA !!!!\n")
+        field = null
+    }
 
 @ExperimentalTime
 fun main() {
@@ -30,39 +42,36 @@ fun main() {
     }
 }
 
-private fun getAllDayClasses(): Collection<Class<out Day>> =
+fun getAllDayClasses(): Collection<Class<out Day>> =
     Reflections("").getSubTypesOf(Day::class.java).filter { it.simpleName.matches(Regex("Day\\d+")) }
+
+fun dayNumber(day: Class<out Day>) = day.simpleName.replace("Day", "").toInt()
 
 @ExperimentalTime
 private fun Class<out Day>.execute(): Duration {
     fun TimedValue<Any?>.show(n: Int, padded: Int) {
         val x = " ".repeat(padded) + "Part $n [$duration]: "
-        println("$x$value".trimEnd().split("\n").joinToString("\n".padEnd(x.length + 1, ' ')))
+        println(
+            "$x$value"
+                .trimEnd()
+                .split("\n")
+                .joinToString("\n".padEnd(x.length + 1, ' '))
+        )
     }
 
     val day = constructors[0].newInstance() as Day
-    print("${day.day}: ${day.title}".restrictWidth(30, 30))
+
+    print("${day.puzzle.day}: ${day.title}".restrictWidth(30, 30))
+
     val part1 = measureTimedValue { day.part1 }
     part1.show(1, 0)
+
     val part2 = measureTimedValue { day.part2 }
     part2.show(2, 30)
 
     return part1.duration + part2.duration
 }
 
-private fun dayNumber(day: Class<out Day>) = day.simpleName.replace("Day", "").toInt()
-
-/**
- * Dirty, but effective way to inject test data globally for one-time use only!
- * Will be reset on first read.
- */
-var globalTestData: String? = null
-    get() = field?.also {
-        println("\n!!!! USING TEST DATA !!!!\n")
-        field = null
-    }
-
-var logEnabled = false
 fun log(message: Terminal.() -> Any?) {
     if (logEnabled && verbose) alog(message)
 }
@@ -80,6 +89,7 @@ data class TestData(val input: String, val expectedPart1: Any?, val expectedPart
         (expectedPart1 != null || expectedPart2 != null) || return true
         globalTestData = input
         val day = create(dayClass)
+
         return listOfNotNull(
             Triple(1, { day.part1() }, "$expectedPart1").takeIf { expectedPart1 != null },
             Triple(2, { day.part2() }, "$expectedPart2").takeIf { expectedPart2 != null }
@@ -96,7 +106,6 @@ data class TestData(val input: String, val expectedPart1: Any?, val expectedPart
             match
         }
     }
-
 }
 
 inline fun <reified T : Day> solve(offerSubmit: Boolean = false, test: SolveDsl<T>.() -> Unit = {}) {
@@ -105,7 +114,6 @@ inline fun <reified T : Day> solve(offerSubmit: Boolean = false, test: SolveDsl<
 }
 
 class SolveDsl<T : Day>(private val dayClass: KClass<T>) {
-
     val tests = mutableListOf<TestData>()
 
     var ok = true
@@ -129,11 +137,6 @@ class SolveDsl<T : Day>(private val dayClass: KClass<T>) {
     fun isEverythingOK() =
         ok && tests.all { it.passesTestsUsing(dayClass) }
 }
-
-/**
- * Global flag to indicate verbosity or silence when loading puzzle input
- */
-var verbose = true
 
 @OptIn(ExperimentalTime::class)
 inline fun runWithTiming(part: String, f: () -> Any?) {
@@ -185,7 +188,7 @@ inline fun <reified T : Any> String.extractAllNumbers(
     else -> error("Cannot extract numbers of type ${klass.simpleName}")
 } as List<T>
 
-private fun <T> warn(msg: String): T? {
+fun <T> warn(msg: String): T? {
     with(aocTerminal) { warning("WARNING: $msg") }
     return null
 }
@@ -199,6 +202,7 @@ fun Any?.restrictWidth(minWidth: Int, maxWidth: Int) = with("$this") {
 }
 
 object AoC {
+
     private val web = AoCWebInterface(getSessionCookie())
 
     fun sendToClipboard(a: Any?): Boolean {
@@ -210,33 +214,36 @@ object AoC {
         }.isSuccess
     }
 
-    fun getPuzzleInput(day: Int, year: Event): List<String> {
-        val cached = readInputFileOrNull(day, year)
+    fun getPuzzleInput(aocPuzzle: AoCPuzzle): List<String> {
+        val cached = readInputFileOrNull(aocPuzzle)
         if (!cached.isNullOrEmpty()) return cached
 
-        return web.downloadInput(FQD(day, year)).onSuccess {
-            writeInputFile(day, year, it)
+        return web.downloadInput(aocPuzzle).onSuccess {
+            writeInputFile(aocPuzzle, it)
         }.getOrElse {
-            listOf("Unable to download $day/$year: $it")
+            listOf("Unable to download ${aocPuzzle}: $it")
         }
     }
 
-    fun submitAnswer(fqd: FQD, part: Part, answer: String): AoCWebInterface.Verdict =
-        web.submitAnswer(fqd, part, answer)
+    fun submitAnswer(aocPuzzle: AoCPuzzle, part: Part, answer: String): AoCWebInterface.Verdict =
+        web.submitAnswer(aocPuzzle, part, answer)
 
     private val logFormat = DateTimeFormatter.ofPattern("HH:mm:ss")
 
-    fun appendSubmitLog(day: Int, year: Event, part: Part, answer: String, verdict: AoCWebInterface.Verdict) {
+    fun appendSubmitLog(aocPuzzle: AoCPuzzle, part: Part, answer: String, verdict: AoCWebInterface.Verdict) {
         val now = LocalDateTime.now()
         val nowText = logFormat.format(now)
-        val id = idFor(day, year, part)
+        val id = idFor(aocPuzzle, part)
         val text =
             "$nowText - $id - submitted \"$answer\" - ${if (verdict is AoCWebInterface.Verdict.Correct) "OK" else "FAIL with ${verdict::class.simpleName}"}"
-        appendSubmitLog(year, text)
-        appendSubmitLog(year, verdict.text)
+        appendSubmitLog(aocPuzzle, text)
+        appendSubmitLog(aocPuzzle, verdict.text)
         if (verdict is AoCWebInterface.Verdict.WithWait) {
             val locked = now + verdict.wait.toJavaDuration()
-            appendSubmitLog(year, "$nowText - $id - LOCKED until ${DateTimeFormatter.ISO_DATE_TIME.format(locked)}")
+            appendSubmitLog(
+                aocPuzzle,
+                "$nowText - $id - LOCKED until ${DateTimeFormatter.ISO_DATE_TIME.format(locked)}"
+            )
         }
     }
 
@@ -289,54 +296,69 @@ object AoC {
                 println("Fire!")
             }
         }
-
     }
 
-    fun previouslySubmitted(day: Int, year: Event, part: Part): PreviousSubmitted =
-        readSubmitLog(year).filter { idFor(day, year, part) in it }.let { relevant ->
-            val answers = relevant.filter { "submitted" in it }.mapNotNull { log ->
-                log.split("\"").getOrNull(1)?.let { it to log }
-            }
-            val locked = if ("LOCKED" in relevant.lastOrNull().orEmpty()) {
-                val lock = relevant.last().substringAfter("until ")
-                LocalDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(lock))
-            } else null
-            PreviousSubmitted(locked, answers.map { it.first }, answers.map { it.second })
-        }
+    fun previouslySubmitted(aocPuzzle: AoCPuzzle, part: Part): PreviousSubmitted =
+        readSubmitLog(aocPuzzle)
+            .filter { idFor(aocPuzzle, part) in it }
+            .let { relevant ->
+                val answers = relevant
+                    .filter { "submitted" in it }
+                    .mapNotNull { log ->
+                        log.split("\"").getOrNull(1)?.let { it to log }
+                    }
 
-    private fun idFor(day: Int, year: Event, part: Part) =
-        "$year day $day part $part"
+                val locked = if ("LOCKED" in relevant.lastOrNull().orEmpty()) {
+                    val lock = relevant.last().substringAfter("until ")
+                    LocalDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(lock))
+                } else null
+
+                PreviousSubmitted(locked, answers.map { it.first }, answers.map { it.second })
+            }
+
+    private fun idFor(aocPuzzle: AoCPuzzle, part: Part) =
+        "${aocPuzzle.year} day ${aocPuzzle.day} part $part"
 
     private fun getSessionCookie() =
         System.getenv("AOC_COOKIE")
-            ?: object {}.javaClass.getResource("session-cookie")?.readText()?.lines()
+            ?: object {}.javaClass.getResource("session-cookie")
+                ?.readText()
+                ?.lines()
                 ?.firstOrNull { it.isNotBlank() }
             ?: warn("No session cookie in environment or file found, will not be able to talk to AoC server.")
 
-    private fun readInputFileOrNull(day: Int, year: Event): List<String>? {
-        val file = File(fileNameFor(day, year))
+    private fun readInputFileOrNull(aocPuzzle: AoCPuzzle): List<String>? {
+        val file = File(fileNameFor(aocPuzzle))
         file.exists() || return null
         return file.readLines()
     }
 
-    private fun writeInputFile(day: Int, year: Event, puzzle: List<String>) {
-        File(pathNameForYear(year)).mkdirs()
-        File(fileNameFor(day, year)).writeText(puzzle.joinToString("\n"))
+    private fun writeInputFile(aocPuzzle: AoCPuzzle, content: List<String>) {
+        File(pathNameForYear(aocPuzzle)).mkdirs()
+        File(fileNameFor(aocPuzzle)).writeText(content.joinToString("\n"))
     }
 
-    private fun readSubmitLog(year: Event): List<String> {
-        val file = File(submitLogFor(year))
+    private fun readSubmitLog(aocPuzzle: AoCPuzzle): List<String> {
+        val file = File(submitLogFor(aocPuzzle))
         file.exists() || return emptyList()
         return file.readLines()
     }
 
-    private fun appendSubmitLog(year: Event, text: String) {
-        File(submitLogFor(year)).appendText("\n$text")
+    private fun pathNameForYear(aocPuzzle: AoCPuzzle): String {
+        return "puzzles/${aocPuzzle.year}"
     }
 
-    private fun fileNameFor(day: Int, year: Event) = "${pathNameForYear(year)}/day${"%02d".format(day)}.txt"
-    private fun submitLogFor(year: Event) = "${pathNameForYear(year)}/submit.log"
-    private fun pathNameForYear(year: Event) = "puzzles/$year"
+    private fun fileNameFor(aocPuzzle: AoCPuzzle): String {
+        return "${pathNameForYear(aocPuzzle)}/day${"%02d".format(aocPuzzle.day)}.txt"
+    }
+
+    private fun submitLogFor(aocPuzzle: AoCPuzzle): String {
+        return "${pathNameForYear(aocPuzzle)}/submit.log"
+    }
+
+    private fun appendSubmitLog(aocPuzzle: AoCPuzzle, content: String) {
+        File(submitLogFor(aocPuzzle)).appendText("\n$content")
+    }
 }
 
 @Suppress("NOTHING_TO_INLINE")
