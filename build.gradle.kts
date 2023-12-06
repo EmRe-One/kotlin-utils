@@ -28,6 +28,9 @@ dependencies {
     implementation("ch.qos.logback:logback-core:1.4.5")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
 
+    implementation("org.reflections:reflections:0.10.2")
+    implementation("com.github.ajalt.mordant:mordant:2.2.0")
+
     testImplementation(kotlin("test"))
 }
 
