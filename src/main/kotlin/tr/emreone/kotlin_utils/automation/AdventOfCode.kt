@@ -258,7 +258,7 @@ data class TestData(val input: String, val expectedPart1: Any?, val expectedPart
         ).all { (part, partFun, expectation) ->
             println(gray("Checking part $part against $expectation..."))
             val actual = partFun()
-            val match = actual == Day.NotYetImplemented || "$actual" == expectation
+            val match = (actual != Day.NotYetImplemented) && "$actual" == expectation
             if (match) {
                 aocTerminal.success("✅ Test succeeded.")
             }
