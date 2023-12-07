@@ -1,10 +1,17 @@
 plugins {
     kotlin("jvm") version "1.9.20"
+    kotlin("plugin.serialization") version "1.9.20"
     `maven-publish`
 }
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://jitpack.io")
+    }
+    maven {
+        url = uri("https://jcenter.bintray.com")
+    }
 }
 
 java {
@@ -28,11 +35,16 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.4.5")
     implementation("ch.qos.logback:logback-core:1.4.5")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
-
     implementation("org.reflections:reflections:0.10.2")
     implementation("com.github.ajalt.mordant:mordant:2.2.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("org.yaml:snakeyaml:2.2")
+
+    implementation("org.apache.commons:commons-text:1.10.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
     testImplementation(kotlin("test"))
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
 }
 
 publishing {
@@ -75,15 +87,14 @@ tasks.register("prepareNextDay") {
         val withTest = true
         val packageIdPath = packageId.replace(".", "/")
 
-        val mainFile    = "${projectDir}/src/main/kotlin/${packageIdPath}/Main.kt"
-        val readmeFile  = "${projectDir}/README.md"
-        val newSrcFile  = "${projectDir}/src/main/kotlin/${packageIdPath}/days/Day${nextDay}.kt"
+        val mainFile = "${projectDir}/src/main/kotlin/${packageIdPath}/Main.kt"
+        val readmeFile = "${projectDir}/README.md"
+        val newSrcFile = "${projectDir}/src/main/kotlin/${packageIdPath}/days/Day${nextDay}.kt"
         val newTestFile = "${projectDir}/src/test/kotlin/${packageIdPath}/days/Day${nextDay}Test.kt"
 
         if (file(newSrcFile).exists()) {
             println("WARNING: Files for Day$nextDay already exists. Do you really want to overwrite it?")
-        }
-        else {
+        } else {
             file(newSrcFile).writeText(
                 file("${projectDir}/template/DayX.kt")
                     .readText()
