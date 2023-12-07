@@ -8,9 +8,15 @@ open class Day private constructor(
     val puzzle: AoCPuzzle,
     val title: String,
     private val terminal: Terminal,
+    private val aoc: AdventOfCode
 ) {
-    constructor(day: Int, year: Int, title: String = "Puzzle unknown", terminal: Terminal = aocTerminal) : this(
-        AoCPuzzle(day, year), title, terminal
+    constructor(
+        day: Int, year: Int,
+        title: String = "Puzzle unknown",
+        terminal: Terminal = aocTerminal,
+        session: String? = null
+    ) : this(
+        AoCPuzzle(day, year), title, terminal, AdventOfCode(session)
     )
 
     var testInput = false
@@ -21,7 +27,7 @@ open class Day private constructor(
         globalTestData?.also {
             logEnabled = true
             testInput = true
-        }?.split("\n") ?: AoC.getPuzzleInput(this.puzzle).also {
+        }?.split("\n") ?: this.aoc.getPuzzleInput(this.puzzle).also {
             logEnabled = false
         }
     }
@@ -90,7 +96,7 @@ open class Day private constructor(
             ?.let { (part, answer) ->
                 with(aocTerminal) {
                     val previouslySubmitted =
-                        AoC.previouslySubmitted(puzzle, part)
+                        aoc.previouslySubmitted(puzzle, part)
                     if (answer in previouslySubmitted) {
                         println(TextColors.brightMagenta("This answer to part $part has been previously submitted!"))
                         return
@@ -108,9 +114,9 @@ open class Day private constructor(
                     )
                     if (choice == "y") {
                         previouslySubmitted.waitUntilFree()
-                        val verdict = AoC.submitAnswer(puzzle, part, answer)
+                        val verdict = aoc.submitAnswer(puzzle, part, answer)
                         println(verdict)
-                        AoC.appendSubmitLog(puzzle, part, answer, verdict)
+                        aoc.appendSubmitLog(puzzle, part, answer, verdict)
                     }
                 }
             }

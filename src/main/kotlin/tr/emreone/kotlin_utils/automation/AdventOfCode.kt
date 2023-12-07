@@ -31,177 +31,18 @@ var globalTestData: String? = null
         field = null
     }
 
-@ExperimentalTime
-fun main() {
-    verbose = false
-    with(aocTerminal) {
-        println(red("\n~~~ Advent Of Code Runner ~~~\n"))
-        val dayClasses = getAllDayClasses().sortedBy(::dayNumber)
-        val totalDuration = dayClasses.map { it.execute() }.reduceOrNull(Duration::plus)
-        println("\nTotal runtime: ${red("$totalDuration")}")
-    }
-}
+//@ExperimentalTime
+//fun main() {
+//    verbose = false
+//    with(aocTerminal) {
+//        println(red("\n~~~ Advent Of Code Runner ~~~\n"))
+//        val dayClasses = getAllDayClasses().sortedBy(::dayNumber)
+//        val totalDuration = dayClasses.map { it.execute() }.reduceOrNull(Duration::plus)
+//        println("\nTotal runtime: ${red("$totalDuration")}")
+//    }
+//}
 
-fun getAllDayClasses(): Collection<Class<out Day>> =
-    Reflections("").getSubTypesOf(Day::class.java).filter { it.simpleName.matches(Regex("Day\\d+")) }
-
-fun dayNumber(day: Class<out Day>) = day.simpleName.replace("Day", "").toInt()
-
-@ExperimentalTime
-fun Class<out Day>.execute(): Duration {
-    fun TimedValue<Any?>.show(n: Int, padded: Int) {
-        val x = " ".repeat(padded) + "Part $n [$duration]: "
-        println(
-            "$x$value"
-                .trimEnd()
-                .split("\n")
-                .joinToString("\n".padEnd(x.length + 1, ' '))
-        )
-    }
-
-    val day = constructors[0].newInstance() as Day
-
-    print("${day.puzzle.day}: ${day.title}".restrictWidth(30, 30))
-
-    val part1 = measureTimedValue { day.part1 }
-    part1.show(1, 0)
-
-    val part2 = measureTimedValue { day.part2 }
-    part2.show(2, 30)
-
-    return part1.duration + part2.duration
-}
-
-fun log(message: Terminal.() -> Any?) {
-    if (logEnabled && verbose) alog(message)
-}
-
-fun alog(message: Terminal.() -> Any?) {
-    if (verbose) println(aocTerminal.message().takeIf { it != Unit } ?: "")
-}
-
-fun <T : Day> create(dayClass: KClass<T>): T =
-    dayClass.constructors.first { it.parameters.isEmpty() }.call()
-
-data class TestData(val input: String, val expectedPart1: Any?, val expectedPart2: Any?) {
-
-    fun <T : Day> passesTestsUsing(dayClass: KClass<T>): Boolean {
-        (expectedPart1 != null || expectedPart2 != null) || return true
-        globalTestData = input
-        val day = create(dayClass)
-
-        return listOfNotNull(
-            Triple(1, { day.part1() }, "$expectedPart1").takeIf { expectedPart1 != null },
-            Triple(2, { day.part2() }, "$expectedPart2").takeIf { expectedPart2 != null }
-        ).all { (part, partFun, expectation) ->
-            println(gray("Checking part $part against $expectation..."))
-            val actual = partFun()
-            val match = actual == Day.NotYetImplemented || "$actual" == expectation
-            if (!match) {
-                aocTerminal.danger("Checking of part $part failed")
-                println("Expected: ${brightRed(expectation)}")
-                println("  Actual: ${brightRed("$actual")}")
-                println(yellow("Check demo ${TextStyles.bold("input")} and demo ${TextStyles.bold("expectation")}!"))
-            }
-            match
-        }
-    }
-}
-
-inline fun <reified T : Day> solve(offerSubmit: Boolean = false, test: SolveDsl<T>.() -> Unit = {}) {
-    if (SolveDsl(T::class).apply(test).isEverythingOK())
-        create(T::class).solve(offerSubmit)
-}
-
-class SolveDsl<T : Day>(private val dayClass: KClass<T>) {
-    val tests = mutableListOf<TestData>()
-
-    var ok = true
-    operator fun String.invoke(part1: Any? = null, part2: Any? = null) {
-        ok || return
-        ok = TestData(this, part1, part2).passesTestsUsing(dayClass)
-    }
-
-    infix fun String.part1(expectedPart1: Any?): TestData =
-        TestData(this, expectedPart1, null).also { tests += it }
-
-    infix fun String.part2(expectedPart2: Any?) {
-        TestData(this, null, expectedPart2).also { tests += it }
-    }
-
-    infix fun TestData.part2(expectedPart2: Any?) {
-        tests.remove(this)
-        copy(expectedPart2 = expectedPart2).also { tests += it }
-    }
-
-    fun isEverythingOK() =
-        ok && tests.all { it.passesTestsUsing(dayClass) }
-}
-
-@OptIn(ExperimentalTime::class)
-inline fun runWithTiming(part: String, f: () -> Any?) {
-    val (result, duration) = measureTimedValue(f)
-    with(aocTerminal) {
-        success("\nSolution $part: (took $duration)\n" + brightBlue("$result"))
-    }
-}
-
-@Suppress("MemberVisibilityCanBePrivate")
-class ParserContext(private val columnSeparator: Regex, private val line: String) {
-    val cols: List<String> by lazy { line.split(columnSeparator) }
-    val nonEmptyCols: List<String> by lazy { cols.filter { it.isNotEmpty() } }
-    val nonBlankCols: List<String> by lazy { cols.filter { it.isNotBlank() } }
-    val ints: List<Int> by lazy { line.extractAllIntegers() }
-    val longs: List<Long> by lazy { line.extractAllLongs() }
-}
-
-fun String.extractInt() = toIntOrNull() ?: sequenceContainedIntegers().first()
-fun String.extractLong() = toLongOrNull() ?: sequenceContainedLongs().first()
-
-private val numberRegex = Regex("(-+)?\\d+")
-private val positiveNumberRegex = Regex("\\d+")
-
-fun String.sequenceContainedIntegers(startIndex: Int = 0, includeNegativeNumbers: Boolean = true): Sequence<Int> =
-    (if (includeNegativeNumbers) numberRegex else positiveNumberRegex).findAll(this, startIndex)
-        .mapNotNull { m -> m.value.toIntOrNull() ?: warn("Number too large for Int: ${m.value}") }
-
-fun String.sequenceContainedLongs(startIndex: Int = 0, includeNegativeNumbers: Boolean = true): Sequence<Long> =
-    (if (includeNegativeNumbers) numberRegex else positiveNumberRegex).findAll(this, startIndex)
-        .mapNotNull { m -> m.value.toLongOrNull() ?: warn("Number too large for Long: ${m.value}") }
-
-fun String.extractAllIntegers(startIndex: Int = 0, includeNegativeNumbers: Boolean = true): List<Int> =
-    sequenceContainedIntegers(startIndex, includeNegativeNumbers).toList()
-
-fun String.extractAllLongs(startIndex: Int = 0, includeNegativeNumbers: Boolean = true): List<Long> =
-    sequenceContainedLongs(startIndex, includeNegativeNumbers).toList()
-
-@Suppress("UNCHECKED_CAST")
-inline fun <reified T : Any> String.extractAllNumbers(
-    startIndex: Int = 0,
-    includeNegativeNumbers: Boolean = true,
-    klass: KClass<T> = T::class,
-): List<T> = when (klass) {
-    Int::class -> extractAllIntegers(startIndex, includeNegativeNumbers)
-    UInt::class -> extractAllIntegers(startIndex, false).map { it.toUInt() }
-    Long::class -> extractAllLongs(startIndex, includeNegativeNumbers)
-    ULong::class -> extractAllLongs(startIndex, false).map { it.toULong() }
-    else -> error("Cannot extract numbers of type ${klass.simpleName}")
-} as List<T>
-
-fun <T> warn(msg: String): T? {
-    with(aocTerminal) { warning("WARNING: $msg") }
-    return null
-}
-
-fun Any?.restrictWidth(minWidth: Int, maxWidth: Int) = with("$this") {
-    when {
-        length > maxWidth -> substring(0, maxWidth - 3) + "..."
-        length < minWidth -> padEnd(minWidth)
-        else -> this
-    }
-}
-
-object AoC {
+class AdventOfCode(var session: String? = null) {
 
     private val web = AoCWebInterface(getSessionCookie())
 
@@ -320,7 +161,8 @@ object AoC {
         "${aocPuzzle.year} day ${aocPuzzle.day} part $part"
 
     private fun getSessionCookie() =
-        System.getenv("AOC_COOKIE")
+        this.session
+            ?: System.getenv("AOC_COOKIE")
             ?: object {}.javaClass.getResource("session-cookie")
                 ?.readText()
                 ?.lines()
@@ -358,6 +200,169 @@ object AoC {
 
     private fun appendSubmitLog(aocPuzzle: AoCPuzzle, content: String) {
         File(submitLogFor(aocPuzzle)).appendText("\n$content")
+    }
+}
+
+
+fun getAllDayClasses(): Collection<Class<out Day>> =
+    Reflections("").getSubTypesOf(Day::class.java).filter { it.simpleName.matches(Regex("Day\\d+")) }
+
+fun dayNumber(day: Class<out Day>) = day.simpleName.replace("Day", "").toInt()
+
+@ExperimentalTime
+fun Class<out Day>.execute(): Duration {
+    fun TimedValue<Any?>.show(n: Int, padded: Int) {
+        val x = " ".repeat(padded) + "Part $n [$duration]: "
+        println(
+            "$x$value"
+                .trimEnd()
+                .split("\n")
+                .joinToString("\n".padEnd(x.length + 1, ' '))
+        )
+    }
+
+    val day = constructors[0].newInstance() as Day
+
+    print("${day.puzzle.day}: ${day.title}".restrictWidth(30, 30))
+
+    val part1 = measureTimedValue { day.part1 }
+    part1.show(1, 0)
+
+    val part2 = measureTimedValue { day.part2 }
+    part2.show(2, 30)
+
+    return part1.duration + part2.duration
+}
+
+fun log(message: Terminal.() -> Any?) {
+    if (logEnabled && verbose) alog(message)
+}
+
+fun alog(message: Terminal.() -> Any?) {
+    if (verbose) println(aocTerminal.message().takeIf { it != Unit } ?: "")
+}
+
+fun <T : Day> create(dayClass: KClass<T>): T =
+    dayClass.constructors.first { it.parameters.isEmpty() }.call()
+
+data class TestData(val input: String, val expectedPart1: Any?, val expectedPart2: Any?) {
+
+    fun <T : Day> passesTestsUsing(dayClass: KClass<T>): Boolean {
+        (expectedPart1 != null || expectedPart2 != null) || return true
+        globalTestData = input
+        val day = create(dayClass)
+
+        return listOfNotNull(
+            Triple(1, { day.part1() }, "$expectedPart1").takeIf { expectedPart1 != null },
+            Triple(2, { day.part2() }, "$expectedPart2").takeIf { expectedPart2 != null }
+        ).all { (part, partFun, expectation) ->
+            println(gray("Checking part $part against $expectation..."))
+            val actual = partFun()
+            val match = actual == Day.NotYetImplemented || "$actual" == expectation
+            if (match) {
+                aocTerminal.success("✅ Test succeeded.")
+            }
+            else {
+                aocTerminal.danger("❌ Checking of part $part failed")
+                println("Expected: ${brightRed(expectation)}")
+                println("  Actual: ${brightRed("$actual")}")
+                println(yellow("Check demo ${TextStyles.bold("input")} and demo ${TextStyles.bold("expectation")}!"))
+            }
+            match
+        }
+    }
+}
+
+inline fun <reified T : Day> solve(offerSubmit: Boolean = false, test: SolveDsl<T>.() -> Unit = {}) {
+    if (SolveDsl(T::class).apply(test).isEverythingOK())
+        create(T::class).solve(offerSubmit)
+}
+
+class SolveDsl<T : Day>(private val dayClass: KClass<T>) {
+    val tests = mutableListOf<TestData>()
+
+    var ok = true
+    operator fun String.invoke(part1: Any? = null, part2: Any? = null) {
+        ok || return
+        ok = TestData(this, part1, part2).passesTestsUsing(dayClass)
+    }
+
+    infix fun String.part1(expectedPart1: Any?): TestData =
+        TestData(this, expectedPart1, null).also { tests += it }
+
+    infix fun String.part2(expectedPart2: Any?) {
+        TestData(this, null, expectedPart2).also { tests += it }
+    }
+
+    infix fun TestData.part2(expectedPart2: Any?) {
+        tests.remove(this)
+        copy(expectedPart2 = expectedPart2).also { tests += it }
+    }
+
+    fun isEverythingOK() =
+        ok && tests.all { it.passesTestsUsing(dayClass) }
+}
+
+@OptIn(ExperimentalTime::class)
+inline fun runWithTiming(part: String, f: () -> Any?) {
+    val (result, duration) = measureTimedValue(f)
+    with(aocTerminal) {
+        success("\nSolution $part: (took $duration)\n" + brightBlue("$result"))
+    }
+}
+
+@Suppress("MemberVisibilityCanBePrivate")
+class ParserContext(private val columnSeparator: Regex, private val line: String) {
+    val cols: List<String> by lazy { line.split(columnSeparator) }
+    val nonEmptyCols: List<String> by lazy { cols.filter { it.isNotEmpty() } }
+    val nonBlankCols: List<String> by lazy { cols.filter { it.isNotBlank() } }
+    val ints: List<Int> by lazy { line.extractAllIntegers() }
+    val longs: List<Long> by lazy { line.extractAllLongs() }
+}
+
+fun String.extractInt() = toIntOrNull() ?: sequenceContainedIntegers().first()
+fun String.extractLong() = toLongOrNull() ?: sequenceContainedLongs().first()
+
+private val numberRegex = Regex("(-+)?\\d+")
+private val positiveNumberRegex = Regex("\\d+")
+
+fun String.sequenceContainedIntegers(startIndex: Int = 0, includeNegativeNumbers: Boolean = true): Sequence<Int> =
+    (if (includeNegativeNumbers) numberRegex else positiveNumberRegex).findAll(this, startIndex)
+        .mapNotNull { m -> m.value.toIntOrNull() ?: warn("Number too large for Int: ${m.value}") }
+
+fun String.sequenceContainedLongs(startIndex: Int = 0, includeNegativeNumbers: Boolean = true): Sequence<Long> =
+    (if (includeNegativeNumbers) numberRegex else positiveNumberRegex).findAll(this, startIndex)
+        .mapNotNull { m -> m.value.toLongOrNull() ?: warn("Number too large for Long: ${m.value}") }
+
+fun String.extractAllIntegers(startIndex: Int = 0, includeNegativeNumbers: Boolean = true): List<Int> =
+    sequenceContainedIntegers(startIndex, includeNegativeNumbers).toList()
+
+fun String.extractAllLongs(startIndex: Int = 0, includeNegativeNumbers: Boolean = true): List<Long> =
+    sequenceContainedLongs(startIndex, includeNegativeNumbers).toList()
+
+@Suppress("UNCHECKED_CAST")
+inline fun <reified T : Any> String.extractAllNumbers(
+    startIndex: Int = 0,
+    includeNegativeNumbers: Boolean = true,
+    klass: KClass<T> = T::class,
+): List<T> = when (klass) {
+    Int::class -> extractAllIntegers(startIndex, includeNegativeNumbers)
+    UInt::class -> extractAllIntegers(startIndex, false).map { it.toUInt() }
+    Long::class -> extractAllLongs(startIndex, includeNegativeNumbers)
+    ULong::class -> extractAllLongs(startIndex, false).map { it.toULong() }
+    else -> error("Cannot extract numbers of type ${klass.simpleName}")
+} as List<T>
+
+fun <T> warn(msg: String): T? {
+    with(aocTerminal) { warning("WARNING: $msg") }
+    return null
+}
+
+fun Any?.restrictWidth(minWidth: Int, maxWidth: Int) = with("$this") {
+    when {
+        length > maxWidth -> substring(0, maxWidth - 3) + "..."
+        length < minWidth -> padEnd(minWidth)
+        else -> this
     }
 }
 
