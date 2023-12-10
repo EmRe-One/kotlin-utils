@@ -22,4 +22,5 @@ gradle-app.setting
 # Cache of project
 .gradletasknamecache
 
+session.cookie
 keys.properties
