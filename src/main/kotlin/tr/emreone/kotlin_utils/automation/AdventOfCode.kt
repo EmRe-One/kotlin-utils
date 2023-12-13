@@ -44,6 +44,12 @@ var globalTestData: String? = null
 
 class AdventOfCode(var session: String? = null) {
 
+    init {
+        if (this.session == null) {
+            this.session = System.getenv("SESSION_COOKIE") ?: System.getenv("AOC_COOKIE")
+        }
+    }
+
     private val web = AoCWebInterface(getSessionCookie())
 
     fun sendToClipboard(a: Any?): Boolean {
@@ -162,7 +168,6 @@ class AdventOfCode(var session: String? = null) {
 
     private fun getSessionCookie() =
         this.session
-            ?: System.getenv("AOC_COOKIE")
             ?: object {}.javaClass.getResource("session-cookie")
                 ?.readText()
                 ?.lines()
