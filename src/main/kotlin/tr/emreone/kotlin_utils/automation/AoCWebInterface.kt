@@ -20,7 +20,7 @@ class AoCWebInterface(private val sessionCookie: String?) {
 
         fun AoCPuzzle.toUri() = "$BASE_URL/$year/day/$day"
 
-        private fun String.urlEncode() = URLEncoder.encode(this, Charsets.UTF_8)
+        private fun String.urlEncode() = URLEncoder.encode(this, "UTF-8")
     }
 
     fun downloadInput(aocPuzzle: AoCPuzzle): Result<List<String>> = runCatching {
