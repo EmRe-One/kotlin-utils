@@ -1,4 +1,4 @@
-package tr.emreone.kotlin_utils
+package tr.emreone.kotlin_utils.extensions
 
 /**
  * Generates all combinations of the elements of the given [Iterable] for the requested size.
@@ -66,9 +66,11 @@ fun <T> Collection<T>.permutations(): Sequence<List<T>> =
         else -> {
             val head = first()
             val tail = drop(1)
-            tail.permutations().flatMap { perm ->
-                (0..perm.size).asSequence().map { perm.copyAndInsert(it, head) }
-            }
+            tail.permutations()
+                .flatMap { perm ->
+                    (0..perm.size).asSequence().map { perm.copyAndInsert(it, head) }
+                }
+                .asSequence()
         }
     }
 
@@ -83,7 +85,7 @@ fun IntRange.permutations(): Sequence<List<Int>> =
         first == last -> sequenceOf(listOf(first))
         else -> {
             val head = first
-            val tail = first+1..last
+            val tail = first + 1..last
             tail.permutations().flatMap { perm ->
                 (0..perm.size).asSequence().map { perm.copyAndInsert(it, head) }
             }
@@ -91,7 +93,7 @@ fun IntRange.permutations(): Sequence<List<Int>> =
     }
 
 fun String.permutations(): Sequence<String> =
-    toList().permutations().map { it.joinToString("") }
+    toList().permutations().map { it.joinToString("") }.asSequence()
 
 fun String.combinations(size: Int): Sequence<String> =
     toList().combinations(size).map { it.joinToString("") }

@@ -99,9 +99,8 @@ class AoCWebInterface(private val sessionCookie: String?) {
             }
 
             private fun String.parseMinSec(): Duration? {
-                val (min, sec) =
-                    (Regex(".* you have (\\d+)m (\\d+)s left to wait.*").matchEntire(lowercase())?.destructured
-                        ?: return null)
+                val (min, sec) = (Regex(".* you have (\\d+)m (\\d+)s left to wait.*")
+                    .matchEntire(lowercase())?.destructured ?: return null)
                 return min.toInt().minutes + sec.toInt().seconds
             }
 

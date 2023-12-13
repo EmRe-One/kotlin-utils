@@ -1,5 +1,6 @@
 package tr.emreone.kotlin_utils.graphics
 
+import tr.emreone.kotlin_utils.automation.AoCPuzzle
 import java.nio.file.Paths
 import kotlin.io.path.absolutePathString
 
@@ -22,13 +23,12 @@ fun main() {
 //    }
 
     val dayScores = mutableMapOf(
-        7 to AoCTileGenerator.DayScores(
+        9 to AoCTileGenerator.DayScores(
             "00:01:12", "1", "100",
             "00:12:53", "123523", "20"
         )
     )
-
-    val path = Paths.get("").toAbsolutePath()
-    aocTileGenerator.generateDayTileImage("7", dayScores.get(7), path)
+    val aocPuzzle = AoCPuzzle(9, 2023)
+    aocTileGenerator.generateDayTileImage(aocPuzzle, dayScores.get(9))
 
 }

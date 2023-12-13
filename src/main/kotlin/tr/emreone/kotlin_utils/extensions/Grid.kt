@@ -1,4 +1,10 @@
-package tr.emreone.kotlin_utils
+package tr.emreone.kotlin_utils.extensions
+
+import minMaxOrNull
+import tr.emreone.kotlin_utils.*
+import tr.emreone.kotlin_utils.Grid
+import tr.emreone.kotlin_utils.MutableGrid
+import tr.emreone.kotlin_utils.fixed
 
 /**
  * An alias for looking at `List<List<T>>` as a [Grid].

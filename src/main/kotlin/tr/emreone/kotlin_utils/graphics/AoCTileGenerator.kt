@@ -5,6 +5,7 @@ import okhttp3.Request
 import okio.IOException
 import org.apache.commons.text.StringEscapeUtils
 import tr.emreone.kotlin_utils.Resources
+import tr.emreone.kotlin_utils.automation.AoCPuzzle
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics2D
@@ -143,12 +144,12 @@ class AoCTileGenerator(val year: Int) {
         return image
     }
 
-    fun mainFont(size: Int): Font {
+    private fun mainFont(size: Int): Font {
         // Implement the logic to get the main font
         return Font("Serif", Font.BOLD, size)
     }
 
-    fun secondaryFont(size: Int): Font {
+    private fun secondaryFont(size: Int): Font {
         // Implement the logic to get the secondary font
         return Font("Serif", Font.PLAIN, size)
     }
@@ -163,13 +164,17 @@ class AoCTileGenerator(val year: Int) {
         return time
     }
 
+    private fun pathNameForTile(aocPuzzle: AoCPuzzle): String {
+        return "../aoc_tiles/${aocPuzzle.year}"
+    }
+
     fun generateDayTileImage(
-        day: String,
+        puzzle: AoCPuzzle,
         dayScores: DayScores?,
-        path: Path,
         languages: List<String> = listOf("kt")
     ) {
-        /*val width = 400
+        /*
+        val width = 400
         val height = 200
         val image = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
         val g2d: Graphics2D = image.createGraphics()
@@ -219,7 +224,7 @@ class AoCTileGenerator(val year: Int) {
         // Zeichnen der "Day" und der Tagesnummer
         g2.drawString("Day", 3, 20)
         g2.font = mainFont(75)
-        g2.drawString(day, 10, 70)
+        g2.drawString(puzzle.day.toString(), 10, 70)
 
         // Zeichnen Sie die Sprachen
         g2.font = secondaryFont(15)
@@ -252,11 +257,11 @@ class AoCTileGenerator(val year: Int) {
         g2.drawLine(105, 50, 195, 50)
 
         // Save the image
-        val tileDir = path.resolve("puzzles/${year}/")
+        val tileDir = Paths.get(this.pathNameForTile(puzzle))
         if (!tileDir.exists()) {
             Files.createDirectories(tileDir)
         }
-        ImageIO.write(image, "png", File(tileDir.resolve("Day%02d.png".format(day.toInt())).toString()))
+        ImageIO.write(image, "png", File(tileDir.resolve("Day%02d.png".format(puzzle.day)).toString()))
     }
 
 }

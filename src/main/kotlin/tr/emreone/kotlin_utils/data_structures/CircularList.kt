@@ -1,4 +1,4 @@
-package tr.emreone.kotlin_utils
+package tr.emreone.kotlin_utils.data_structures
 
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract

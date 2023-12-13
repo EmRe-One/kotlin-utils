@@ -192,7 +192,7 @@ class AdventOfCode(var session: String? = null) {
     }
 
     private fun pathNameForYear(aocPuzzle: AoCPuzzle): String {
-        return "puzzles/${aocPuzzle.year}"
+        return "../aoc_puzzles/${aocPuzzle.year}"
     }
 
     private fun fileNameFor(aocPuzzle: AoCPuzzle): String {
@@ -279,8 +279,9 @@ data class TestData(val input: String, val expectedPart1: Any?, val expectedPart
 }
 
 inline fun <reified T : Day> solve(offerSubmit: Boolean = false, test: SolveDsl<T>.() -> Unit = {}) {
-    if (SolveDsl(T::class).apply(test).isEverythingOK())
+    if (SolveDsl(T::class).apply(test).isEverythingOK()) {
         create(T::class).solve(offerSubmit)
+    }
 }
 
 class SolveDsl<T : Day>(private val dayClass: KClass<T>) {

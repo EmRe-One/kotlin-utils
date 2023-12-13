@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package tr.emreone.kotlin_utils
+package tr.emreone.kotlin_utils.data_structures
 
 import java.util.*
 

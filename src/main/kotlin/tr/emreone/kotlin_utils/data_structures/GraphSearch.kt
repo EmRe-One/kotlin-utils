@@ -1,5 +1,6 @@
-package tr.emreone.kotlin_utils
+package tr.emreone.kotlin_utils.data_structures
 
+import tr.emreone.kotlin_utils.minPriorityQueueOf
 import java.util.*
 import kotlin.collections.ArrayDeque
 
@@ -143,6 +144,7 @@ abstract class UninformedSearch<N, E>(val graph: EdgeGraph<N, E>) : EdgeGraph<N,
     data class Result<N, E>(val node: N, val prev: Map<N, Pair<N, E>>, val visited: Set<N>)
 
     fun search(start: N, destination: N) = search(start) { it == destination }
+
     open fun search(start: N, solutionPredicate: SolutionPredicate<N>): Result<N, E>? =
         traverse(start).firstOrNull { solutionPredicate(it.node) }
 
@@ -170,8 +172,6 @@ abstract class UninformedSearch<N, E>(val graph: EdgeGraph<N, E>) : EdgeGraph<N,
             }
         }
     }
-
-
 }
 
 fun <N, E> SearchEngineWithEdges<N, E>.bfsSequence(startNode: N): Sequence<N> = sequence {

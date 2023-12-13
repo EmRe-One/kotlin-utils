@@ -1,5 +1,6 @@
-package tr.emreone.kotlin_utils
+package tr.emreone.kotlin_utils.math
 
+import tr.emreone.kotlin_utils.extensions.safeTimes
 import kotlin.math.absoluteValue
 import kotlin.math.pow
 

@@ -1,4 +1,5 @@
-package tr.emreone.kotlin_utils
+package tr.emreone.kotlin_utils.extensions
+
 
 val IntRange.size get() = (last - first + 1).coerceAtLeast(0)
 val LongRange.size get() = (last - first + 1).coerceAtLeast(0)

@@ -1,18 +1,18 @@
-package tr.emreone.kotlin_utils
+package tr.emreone.kotlin_utils.data_structures
 
 /**
- * Creates a [MinPriorityQueue] with all [elements] initially added with their given priority.
+ * Creates a [MinPriorityQueueI] with all [elements] initially added with their given priority.
  */
-fun <T> minPriorityQueueOf(vararg elements: Pair<T, Int>): MinPriorityQueue<T> =
-    MinPriorityQueueImpl<T>().apply { elements.forEach { this += it } }
+fun <T> minPriorityQueueOf(vararg elements: Pair<T, Int>): MinPriorityQueueI<T> =
+    MinPriorityQueue<T>().apply { elements.forEach { this += it } }
 
 /**
- * Creates a [MinPriorityQueue] with all [elements] initially added with an [initialPriority].
+ * Creates a [MinPriorityQueueI] with all [elements] initially added with an [initialPriority].
  */
-fun <T> minPriorityQueueOf(initialPriority: Int = 0, vararg elements: T): MinPriorityQueue<T> =
-    MinPriorityQueueImpl<T>().apply { elements.forEach { insertOrUpdate(it, initialPriority) } }
+fun <T> minPriorityQueueOf(initialPriority: Int = 0, vararg elements: T): MinPriorityQueueI<T> =
+    MinPriorityQueue<T>().apply { elements.forEach { insertOrUpdate(it, initialPriority) } }
 
-interface MinPriorityQueue<T> : Set<T> {
+interface MinPriorityQueueI<T> : Set<T> {
     fun insertOrUpdate(element: T, priority: Int)
     fun decreasePriority(element: T, priority: Int): Boolean
     fun remove(element: T): Boolean
@@ -33,13 +33,13 @@ interface MinPriorityQueue<T> : Set<T> {
         remove(element)
     }
 
-    operator fun plus(other: MinPriorityQueue<T>) = minPriorityQueueOf<T>().apply {
+    operator fun plus(other: MinPriorityQueueI<T>) = minPriorityQueueOf<T>().apply {
         for (e in this) this += e to getPriorityOf(e)
         for (e in other) this += e to other.getPriorityOf(e)
     }
 }
 
-private class MinPriorityQueueImpl<T> : MinPriorityQueue<T> {
+private class MinPriorityQueue<T> : MinPriorityQueueI<T> {
     private val elementToPrio = HashMap<T, Int>()
     private val prioToElement = HashMap<Int, MutableSet<T>>()
     private val priorities = sortedSetOf<Int>()
