@@ -1,6 +1,5 @@
 package tr.emreone.kotlin_utils.data_structures
 
-import tr.emreone.kotlin_utils.minPriorityQueueOf
 import java.util.*
 import kotlin.collections.ArrayDeque
 

@@ -1,6 +1,6 @@
 package tr.emreone.kotlin_utils.data_structures
 
-import tr.emreone.kotlin_utils.asInfiniteSequence
+import asInfiniteSequence
 
 
 class InfiniteList<T>(private val backingList: List<T>) : List<T> by backingList {

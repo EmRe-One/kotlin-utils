@@ -25,6 +25,8 @@ import kotlin.math.sin
 val TEXT_COLOR = Color.WHITE
 val OUTLINE_COLOR = Color.BLACK
 val NOT_COMPLETED_COLOR = Color.GRAY
+val TILE_WIDTH = 700
+val TILE_HEIGHT = 350
 val TILE_WIDTH_PX = 161 // Die Breite jedes Kachelteils
 val SHOW_CHECKMARK_INSTEAD_OF_TIME_RANK = false // Ändern Sie dies entsprechend Ihrer Anforderung
 
@@ -214,8 +216,9 @@ class AoCTileGenerator(val year: Int) {
         val outlineColor = Color.BLACK // Used if text outline is needed
 
         // Initial settings
-        val image = getAlternatingBackground(languages, dayScores?.time2 == null)
-        val g2: Graphics2D = image.createGraphics()
+        //  val image = getAlternatingBackground(languages, dayScores?.time2 == null)
+        val image = HexagonBackground().createHexagonPatternImage(TILE_WIDTH, TILE_HEIGHT)
+        /*val g2: Graphics2D = image.createGraphics()
 
         // Texteigenschaften und Farben
         g2.color = TEXT_COLOR
@@ -254,7 +257,7 @@ class AoCTileGenerator(val year: Int) {
         // Zeichnen von Trennlinien
         g2.color = NOT_COMPLETED_COLOR
         g2.drawLine(100, 5, 100, 95)
-        g2.drawLine(105, 50, 195, 50)
+        g2.drawLine(105, 50, 195, 50)*/
 
         // Save the image
         val tileDir = Paths.get(this.pathNameForTile(puzzle))

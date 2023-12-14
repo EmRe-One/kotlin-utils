@@ -1,10 +1,7 @@
 package tr.emreone.kotlin_utils.extensions
 
 import minMaxOrNull
-import tr.emreone.kotlin_utils.*
-import tr.emreone.kotlin_utils.Grid
-import tr.emreone.kotlin_utils.MutableGrid
-import tr.emreone.kotlin_utils.fixed
+import tr.emreone.kotlin_utils.math.*
 
 /**
  * An alias for looking at `List<List<T>>` as a [Grid].
@@ -202,7 +199,8 @@ private fun Area.buildFormatted(
             }
         }
         colHeader to { r -> "$r ".padStart(maxRowWidth) }
-    } else {
+    }
+    else {
         "" to { _: Int -> "" }
     }
     return rowRange.joinToString(System.lineSeparator(), prefix = colPrefix, postfix = System.lineSeparator()) { row ->
