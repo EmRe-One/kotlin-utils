@@ -1,5 +1,8 @@
 package tr.emreone.kotlin_utils
 
+import tr.emreone.kotlin_utils.math.Point
+import tr.emreone.kotlin_utils.math.x
+import tr.emreone.kotlin_utils.math.y
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong

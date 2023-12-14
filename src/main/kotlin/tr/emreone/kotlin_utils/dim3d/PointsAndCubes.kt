@@ -1,6 +1,6 @@
 package tr.emreone.kotlin_utils.dim3d
 
-import tr.emreone.kotlin_utils.range
+import tr.emreone.kotlin_utils.extensions.range
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
