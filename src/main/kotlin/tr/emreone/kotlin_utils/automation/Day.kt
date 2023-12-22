@@ -15,9 +15,7 @@ open class Day private constructor(
         title: String = "Puzzle unknown",
         terminal: Terminal = aocTerminal,
         session: String? = null
-    ) : this(
-        AoCPuzzle(day, year), title, terminal, AdventOfCode(session)
-    )
+    ) : this(AoCPuzzle(day, year), title, terminal, AdventOfCode(session))
 
     var testInput = false
 

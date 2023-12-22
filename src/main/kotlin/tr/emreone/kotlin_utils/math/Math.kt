@@ -33,6 +33,34 @@ fun lcm(a: Long, b: Long) = (a safeTimes b) / gcd(a, b)
 fun lcm(f: Long, vararg n: Long): Long = n.fold(f, ::lcm)
 fun Iterable<Long>.lcm(): Long = reduce(::lcm)
 
+
+/**
+ * Takes a list of base/modulo combinations and returns the lowest number for which the states coincide such that:
+ *
+ * for all i: state(i) == base_state(i).
+ *
+ * E.g. chineseRemainder((3,4), (5,6), (2,5)) == 47
+ */
+fun chineseRemainder(values: List<Pair<Long, Long>>): Pair<Long, Long>? {
+    if (values.isEmpty()) {
+        return null
+    }
+    var (result, lcm) = values[0]
+    outer@ for (i in 1 until values.size) {
+        val (base, modulo) = values[i]
+        val target = base % modulo
+        for (j in 0L until modulo) {
+            if (result % modulo == target) {
+                lcm = lcm(lcm, modulo)
+                continue@outer
+            }
+            result += lcm
+        }
+        return null
+    }
+    return result to lcm
+}
+
 /**
  * Simple algorithm to find the primes of the given Int.
  */
