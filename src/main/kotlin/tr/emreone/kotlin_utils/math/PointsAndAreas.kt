@@ -165,6 +165,17 @@ inline fun Area.forBorder(f: (p: Point) -> Unit) {
 }
 
 operator fun Area.contains(p: Point) = p.x in first.x..second.x && p.y in first.y..second.y
+operator fun Area.plus(amount: Int) = grow(by = amount)
+operator fun Area.minus(amount: Int) = shrink(by = amount)
+
+const val LEFT_ARROW = '\u2190'
+const val UP_ARROW = '\u2191'
+const val RIGHT_ARROW = '\u2192'
+const val DOWN_ARROW = '\u2193'
+const val NW_ARROW = '\u2196'
+const val NE_ARROW = '\u2197'
+const val SE_ARROW = '\u2198'
+const val SW_ARROW = '\u2199'
 
 val Area.width: Int
     get() = (second.x - first.x + 1).coerceAtLeast(0)
