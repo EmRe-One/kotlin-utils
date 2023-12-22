@@ -25,9 +25,6 @@ val Iterable<Point>.area: Area get() = areaOrNull ?: error("No points given")
 val Iterable<Point>.areaOrNull: Area? get() = boundingArea()
 val MapGrid<*>.area: Area get() = areaOrNull ?: error("No points given in Map")
 val MapGrid<*>.areaOrNull: Area? get() = keys.boundingArea()
-val MutableMapGrid<*>.area: Area get() = areaOrNull ?: error("No points given in Map")
-val MutableMapGrid<*>.areaOrNull: Area? get() = keys.boundingArea()
-
 
 /**
  * The last (bottom right) point in this [Grid] or `-1 to -1` for an empty Grid.
@@ -153,22 +150,6 @@ fun <T> Grid<T>.formatted(
     area.size > 0 || return "empty grid, nothing to show"
     return area.buildFormatted(reverseX, reverseY, showHeaders) element@{ col, row ->
         val value = this[row].getOrElse(col) { return@element filler }
-        transform(col to row, value)
-    }
-}
-
-fun <T> MapGrid<T>.formatted(
-    restrictArea: Area? = null,
-    filler: Any = ' ',
-    reverseX: Boolean = false,
-    reverseY: Boolean = false,
-    showHeaders: Boolean = true,
-    transform: (Point, T) -> String = { _, value -> "$value" },
-): String {
-    val area = restrictArea ?: keys.boundingArea() ?: return "empty map, nothing to show"
-    return area.buildFormatted(reverseX, reverseY, showHeaders) element@{ col, row ->
-        val point = col to row
-        val value = getOrElse(point) { return@element "$filler" }
         transform(col to row, value)
     }
 }
