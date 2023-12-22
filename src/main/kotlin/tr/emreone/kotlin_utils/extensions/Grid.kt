@@ -25,6 +25,8 @@ val Iterable<Point>.area: Area get() = areaOrNull ?: error("No points given")
 val Iterable<Point>.areaOrNull: Area? get() = boundingArea()
 val MapGrid<*>.area: Area get() = areaOrNull ?: error("No points given in Map")
 val MapGrid<*>.areaOrNull: Area? get() = keys.boundingArea()
+val MutableMapGrid<*>.area: Area get() = areaOrNull ?: error("No points given in Map")
+val MutableMapGrid<*>.areaOrNull: Area? get() = keys.boundingArea()
 
 
 /**
