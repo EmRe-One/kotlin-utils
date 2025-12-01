@@ -4,7 +4,7 @@ data class AoCPuzzle(val day: Int, val year: Int) {
 
     init {
         require(day in 1..25) { "Invalid day $day" }
-        require(year in 2015..2024) { "Invalid year $year" }
+        require(year in 2015..2025) { "Invalid year $year" }
     }
 
     override fun toString() = "AoC-Puzzle: %02d. Dec. %4d".format(day, year)
